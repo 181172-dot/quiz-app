@@ -1,48 +1,127 @@
 
 <!DOCTYPE html>
 <html>
-<body style="text-align:center">
+  <style>
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #f4f6f8;
+  text-align: center;
+  padding: 20px;
+}
 
+h2 {
+  margin-bottom: 10px;
+}
+
+.input-box {
+  margin-bottom: 15px;
+}
+
+input {
+  padding: 8px;
+  font-size: 16px;
+  width: 200px;
+}
+
+button {
+  padding: 8px 16px;
+  font-size: 16px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+#list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.card-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+.card-answer {
+  font-size: 18px;
+  min-height: 24px;
+}
+.locked {
+  color: #999;
+}
+</style>
+
+<body style="text-align:center">
 <h2>クイズ回答</h2>
 
-<input id="name" placeholder="名前"><br><br>
-<input id="answer" placeholder="答え">
-<button onclick="send()">送信</button>
+<div class="input-box">
+  <input id="name" placeholder="名前">
+</div>
+
+<div class="input-box">
+  <input id="answer" placeholder="答え">
+  <button onclick="send()">送信</button>
+</div>
 
 <h3>みんなの回答</h3>
 <div id="list"></div>
 
+
 <script>
 const ws = new WebSocket(location.origin.replace("http","ws"));
 let opened = false;
+let locked = false;
+let fixedName = ""; // ★名前固定
 
 ws.onmessage = e=>{
   const data = JSON.parse(e.data);
   if(data.type==="update"){
     opened = data.opened;
+    locked = data.locked;
     render(data.answers);
   }
 };
 
 function send(){
+  if(locked){
+    alert("回答は締め切られました");
+    return;
+  }
+
+  // 名前を初回だけ確定
+  if(!fixedName){
+    const n = name.value.trim();
+    if(n === ""){
+      alert("名前を入力してください");
+      return;
+    }
+    fixedName = n;
+    name.disabled = true; // ★名前変更不可
+  }
+
   ws.send(JSON.stringify({
     type:"answer",
-    name:name.value,
-    answer:answer.value
+    name: fixedName,
+    answer: answer.value.trim()
   }));
 }
-
-function render(ans){
-  list.innerHTML="";
-  for(let n in ans){
-    list.innerHTML += `
-      <div style="border:1px solid #ccc;margin:5px">
-        <b>${n}</b><br>
-        ${opened ? ans[n] : "？？？"}
-      </div>`;
-  }
-}
 </script>
+
 
 </body>
 </html>
