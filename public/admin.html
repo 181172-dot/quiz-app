@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<script>
+if(sessionStorage.admin!=="ok"){
+  location.href="login.html";
+}
+</script>
+
+<h2>管理者ページ</h2>
+<button onclick="openAll()">一斉オープン</button>
+<button onclick="reset()">リセット</button>
+
+<script>
+const ws = new WebSocket(location.origin.replace("http","ws"));
+
+function openAll(){
+  ws.send(JSON.stringify({type:"open"}));
+}
+function reset(){
+  ws.send(JSON.stringify({type:"reset"}));
+}
+</script>
+
+</body>
+</html>
