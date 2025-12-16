@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html>
+<body style="text-align:center">
+
+<h2>クイズ回答</h2>
+
+<input id="name" placeholder="名前"><br><br>
+<input id="answer" placeholder="答え">
+<button onclick="send()">送信</button>
+
+<h3>みんなの回答</h3>
+<div id="list"></div>
+
+<script>
+const ws = new WebSocket(location.origin.replace("http","ws"));
+let opened = false;
+
+ws.onmessage = e=>{
+  const data = JSON.parse(e.data);
+  if(data.type==="update"){
+    opened = data.opened;
+    render(data.answers);
+  }
+};
+
+function send(){
+  ws.send(JSON.stringify({
+    type:"answer",
+    name:name.value,
+    answer:answer.value
+  }));
+}
+
+function render(ans){
+  list.innerHTML="";
+  for(let n in ans){
+    list.innerHTML += `
+      <div style="border:1px solid #ccc;margin:5px">
+        <b>${n}</b><br>
+        ${opened ? ans[n] : "？？？"}
+      </div>`;
+  }
+}
+</script>
+
+</body>
+</html>
