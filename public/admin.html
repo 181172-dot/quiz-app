@@ -13,7 +13,8 @@ if(sessionStorage.admin!=="ok"){
 <button onclick="reset()">リセット</button>
 
 <script>
-const ws = new WebSocket(location.origin.replace("http","ws"));
+const protocol = location.protocol === "https:" ? "wss://" : "ws://";
+const ws = new WebSocket(protocol + location.host);
 
 function openAll(){
   ws.send(JSON.stringify({type:"open"}));
