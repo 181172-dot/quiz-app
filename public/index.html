@@ -84,43 +84,69 @@ button:hover {
 
 <script>
 const ws = new WebSocket(location.origin.replace("http","ws"));
+
 let opened = false;
 let locked = false;
-let fixedName = ""; // ★名前固定
+let fixedName = "";
 
-ws.onmessage = e=>{
+ws.onmessage = e => {
   const data = JSON.parse(e.data);
-  if(data.type==="update"){
+
+  if (data.type === "update") {
     opened = data.opened;
     locked = data.locked;
     render(data.answers);
   }
 };
 
-function send(){
-  if(locked){
+function send() {
+  if (locked) {
     alert("回答は締め切られました");
     return;
   }
 
-  // 名前を初回だけ確定
-  if(!fixedName){
+  // 名前を最初の1回だけ確定
+  if (!fixedName) {
     const n = name.value.trim();
-    if(n === ""){
+    if (n === "") {
       alert("名前を入力してください");
       return;
     }
     fixedName = n;
-    name.disabled = true; // ★名前変更不可
+    name.disabled = true;
   }
 
   ws.send(JSON.stringify({
-    type:"answer",
+    type: "answer",
     name: fixedName,
     answer: answer.value.trim()
   }));
 }
+
+/* ===== render関数（ここが重要） ===== */
+function render(ans) {
+  list.innerHTML = "";
+
+  for (let n in ans) {
+    const v = ans[n];
+
+    let text = "？？？";
+    if (opened) {
+      text = v === "" ? "" : v;
+    }
+
+    list.innerHTML += `
+      <div class="card">
+        <div class="card-name">${n}</div>
+        <div class="card-answer ${locked ? "locked" : ""}">
+          ${text}
+        </div>
+      </div>
+    `;
+  }
+}
 </script>
+
 
 
 </body>
