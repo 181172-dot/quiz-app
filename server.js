@@ -32,7 +32,8 @@ wss.on("connection", ws => {
       c.send(JSON.stringify({
         type:"update",
         answers,
-        opened
+        opened,
+        locked
       }));
     });
   });
