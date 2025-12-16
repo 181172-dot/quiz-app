@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>管理者ログイン</h2>
+<input type="password" id="pw">
+<button onclick="go()">ログイン</button>
+
+<script>
+const PASS="quiz123";
+function go(){
+  if(pw.value===PASS){
+    sessionStorage.admin="ok";
+    location.href="admin.html";
+  }else alert("違います");
+}
+</script>
+</body>
+</html>
